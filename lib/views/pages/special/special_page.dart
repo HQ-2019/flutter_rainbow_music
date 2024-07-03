@@ -9,9 +9,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rainbow_music/base/extension/string.dart';
 import 'package:flutter_rainbow_music/base/widgets/custom_sliver_persistent_header_delegate.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
+import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
 import 'package:flutter_rainbow_music/model/rank_item_model.dart';
 import 'package:flutter_rainbow_music/model/special_item_model.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
+import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
 import 'package:flutter_rainbow_music/views/pages/special/logic.dart';
 import 'package:flutter_rainbow_music/views/widgets/song_item_view.dart';
 import 'package:get/get.dart';
@@ -304,8 +306,24 @@ class _SpecialPageState extends State<SpecialPage>
               onTap: () {
                 if (itemModel != null) {
                   PlayerManager().playList(
-                      song: itemModel, list: songs!.cast<MusicProvider>());
+                      song: itemModel,
+                      list: songs!.cast<MusicProvider>(),
+                      source: '歌单：${_logic.model?.specialname}');
                 }
+              },
+              favoriteTap: () {
+                if (UserManager.isLogin()) {
+                  UserManager().addFavoriteSong();
+                  return;
+                }
+
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    fullscreenDialog: true,
+                    builder: (context) => const LoginPage(),
+                  ),
+                );
               },
             ),
           );

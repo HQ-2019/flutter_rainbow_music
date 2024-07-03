@@ -38,6 +38,10 @@ class PlayerManager {
   List<MusicProvider> _playlist = [];
   List<MusicProvider> get playlist => _playlist;
 
+  // 当前列表来源
+  String? _playlistSource;
+  String? get playlistSource => _playlistSource;
+
   // 当前选择的音乐
   MusicProvider? _currentSong;
   MusicProvider? get currentSong => _currentSong;
@@ -90,7 +94,11 @@ class PlayerManager {
     _playbackModel = model;
   }
 
-  void updatePlayList(List<MusicProvider>? list) {
+  void updatePlaylistSource(String? source) {
+    _playlistSource = source;
+  }
+
+  void updatePlaylist(List<MusicProvider>? list) {
     if (list == null) {
       _playlist = [];
       return;
@@ -112,6 +120,7 @@ class PlayerManager {
   void cleanPlayList() {
     _player.stop();
     _playlist.clear();
+    _playlistSource = null;
     _currentSong = null;
     _timeLenght = null;
   }
@@ -134,6 +143,7 @@ class PlayerManager {
     _playlist.remove(song);
   }
 
+  /// 播放下一首
   void playNext() {
     if (_playlist.isEmpty) {
       return;
@@ -166,13 +176,21 @@ class PlayerManager {
     play(_playlist[nextIndex]);
   }
 
-  void playList({List<MusicProvider>? list, required MusicProvider song}) {
+  /// 播放歌曲列表
+  void playList(
+      {required MusicProvider song,
+      List<MusicProvider>? list,
+      String? source}) {
     if (list != null && list.isNotEmpty) {
-      updatePlayList(list);
+      updatePlaylist(list);
+    }
+    if (source != null) {
+      updatePlaylistSource(source);
     }
     play(song);
   }
 
+  /// 播放歌曲
   void play(MusicProvider song) {
     if (_currentSong == null || _currentSong?.fetchHash() != song.fetchHash()) {
       _currentSong = song;

@@ -8,10 +8,12 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
+import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
 import 'package:flutter_rainbow_music/model/banner_model.dart';
 import 'package:flutter_rainbow_music/model/rank_item_model.dart';
 import 'package:flutter_rainbow_music/model/song_item_model.dart';
 import 'package:flutter_rainbow_music/model/special_item_model.dart';
+import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
 import 'package:flutter_rainbow_music/views/pages/recommend/logic.dart';
 import 'package:flutter_rainbow_music/views/pages/song_chart/song_chart_page.dart';
 import 'package:flutter_rainbow_music/views/pages/special/special_page.dart';
@@ -165,21 +167,34 @@ class _RecommendPageState extends State<RecommendPage>
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               var itemModel = songs[index];
-              return Container(
-                child: SongItemView(
-                  padding: const EdgeInsets.all(8),
-                  borderRadius: 6,
-                  coverUrl: itemModel?.fetchCoverUrl() ?? '',
-                  songName: itemModel?.fetchSongName() ?? '--',
-                  singerName: itemModel?.fetchSingerName() ?? '--',
-                  isSelected: itemModel?.fetchIsSelected() ?? false,
-                  onTap: () {
-                    if (itemModel == null) {
-                      return;
-                    }
-                    PlayerManager().playList(song: itemModel, list: songs);
-                  },
-                ),
+              return SongItemView(
+                padding: const EdgeInsets.all(8),
+                borderRadius: 6,
+                coverUrl: itemModel?.fetchCoverUrl() ?? '',
+                songName: itemModel?.fetchSongName() ?? '--',
+                singerName: itemModel?.fetchSingerName() ?? '--',
+                isSelected: itemModel?.fetchIsSelected() ?? false,
+                onTap: () {
+                  if (itemModel == null) {
+                    return;
+                  }
+                  PlayerManager().playList(
+                      song: itemModel, list: songs, source: '首页：新歌速递');
+                },
+                favoriteTap: () {
+                  if (UserManager.isLogin()) {
+                    UserManager().addFavoriteSong();
+                    return;
+                  }
+
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      fullscreenDialog: true,
+                      builder: (context) => const LoginPage(),
+                    ),
+                  );
+                },
               );
             },
           ),

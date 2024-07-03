@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 
 class PlaylistPageLogic extends GetxController {
   List<MusicProvider> songs = [];
+  String? songsSource;
   List<String> playedList = [];
   List<String> selectedList = [];
   StreamSubscription? playSubscription;
@@ -16,13 +17,16 @@ class PlaylistPageLogic extends GetxController {
   @override
   void onReady() {
     super.onReady();
+
+    songsSource = PlayerManager().playlistSource;
+
     if (PlayerManager().playlist != null) {
       songs.addAll(PlayerManager().playlist);
       final playHash = PlayerManager().currentSong?.fetchHash();
       if (playHash != null) {
         playedList.add(playHash);
       }
-      update();
+      // update();
     }
 
     // 监听播放音乐

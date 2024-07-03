@@ -7,6 +7,7 @@ import 'package:flutter_rainbow_music/base/utils/router_observer_util.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
+import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
 import 'package:flutter_rainbow_music/views/pages/playlist/logic.dart';
 import 'package:get/get.dart';
 
@@ -136,10 +137,14 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                         ),
                         GetBuilder<PlaylistPageLogic>(builder: (logic) {
                           final songCount = logic.songs.length;
+                          final sourceText = logic.songsSource == null
+                              ? ''
+                              : '来自${logic.songsSource}';
+                          final playText = songCount > 0
+                              ? '已播 ${logic.playedList.length}/$songCount'
+                              : '';
                           return Text(
-                            songCount > 0
-                                ? '来自：xxxxxxx   已播：${logic.playedList.length}/${songCount}'
-                                : '',
+                            '$sourceText  $playText',
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.black45),
                           );
@@ -379,14 +384,24 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
             ),
             if (!_isEditing && model.fetchIsSelected()) ...[
               SizedBox(
-                  width: 40,
-                  child: IconButton(
-                      color: Colors.black26,
-                      icon: const Icon(
-                        Icons.favorite_border,
-                        size: 20,
+                width: 40,
+                child: IconButton(
+                  color: Colors.black26,
+                  icon: const Icon(
+                    Icons.favorite_border,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => const LoginPage(),
                       ),
-                      onPressed: () {})),
+                    );
+                  },
+                ),
+              ),
               SizedBox(
                 width: 40,
                 child: IconButton(

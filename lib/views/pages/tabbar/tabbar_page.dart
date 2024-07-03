@@ -10,7 +10,6 @@ import 'package:flutter_rainbow_music/manager/player/eventbus/player_event.dart'
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/views/pages/home/home_page.dart';
 import 'package:flutter_rainbow_music/views/pages/my/my_page.dart';
-import 'package:flutter_rainbow_music/views/pages/playlist/playlist_page.dart';
 import 'package:flutter_rainbow_music/views/widgets/player_view.dart';
 
 class TabBarPage extends StatefulWidget {
@@ -257,22 +256,6 @@ class _TabBarPageState extends State<TabBarPage> with RouteAware {
         height: 50,
         width: double.infinity,
         song: PlayerManager().currentSong,
-        playlistOnTap: () {
-          setState(() {
-            _bottomViewIsVisible = false;
-          });
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              opaque: false,
-              barrierColor: Colors.transparent,
-              fullscreenDialog: true,
-              pageBuilder: (context, animation, secondaryAnimation) {
-                return const PlaylistPage();
-              },
-            ),
-          );
-        },
       ),
     ]);
   }

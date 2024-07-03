@@ -10,6 +10,7 @@ import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_rainbow_music/views/pages/playlist/playlist_page.dart';
 
 /// 音乐播放视图，HookWidget是StatefulWidget替代方案
 class PlayerView extends HookWidget {
@@ -20,8 +21,7 @@ class PlayerView extends HookWidget {
       this.height = 50,
       this.margin,
       this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-      this.decoration,
-      this.playlistOnTap});
+      this.decoration});
 
   final MusicProvider? song;
   final EdgeInsetsGeometry? margin;
@@ -29,7 +29,6 @@ class PlayerView extends HookWidget {
   final Decoration? decoration;
   final double width;
   final double height;
-  final VoidCallback? playlistOnTap;
 
   @override
   Widget build(BuildContext context) {
@@ -75,148 +74,187 @@ class PlayerView extends HookWidget {
       return null;
     }, [playState.value]);
 
-    return Container(
-      margin: margin,
-      padding: padding,
-      width: width,
-      height: height,
-      decoration: decoration ??
-          BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            color: backgroundColor.value,
-          ),
-      child: Stack(
-        children: [
-          ValueListenableBuilder<double>(
-            valueListenable: progress,
-            builder: (context, value, child) {
-              return LinearProgressIndicator(
-                minHeight: 2,
-                backgroundColor: Colors.transparent,
-                value: value,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.white.withOpacity(0.5)),
-                borderRadius: BorderRadius.circular(1),
-              );
-            },
-          ),
-          Row(
-            children: [
-              // Image
-              RepaintBoundary(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Container(
-                    height: 30,
-                    width: 30,
-                    color: hasSong ? Colors.white : Colors.grey,
-                    child: hasSong == null
-                        ? null
-                        : AnimatedBuilder(
-                            animation: rotationController,
-                            child: CachedNetworkImage(
-                              imageUrl:
-                                  currentSong.value?.fetchCoverUrl() ?? '',
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => Container(),
+    return GestureDetector(
+      onTap: () => _viewTap(context),
+      child: Container(
+        margin: margin,
+        padding: padding,
+        width: width,
+        height: height,
+        decoration: decoration ??
+            BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              color: backgroundColor.value,
+            ),
+        child: Stack(
+          children: [
+            ValueListenableBuilder<double>(
+              valueListenable: progress,
+              builder: (context, value, child) {
+                return LinearProgressIndicator(
+                  minHeight: 2,
+                  backgroundColor: Colors.transparent,
+                  value: value,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.white.withOpacity(0.5)),
+                  borderRadius: BorderRadius.circular(1),
+                );
+              },
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                RepaintBoundary(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      color: hasSong ? Colors.white : Colors.grey,
+                      child: hasSong == null
+                          ? null
+                          : AnimatedBuilder(
+                              animation: rotationController,
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    currentSong.value?.fetchCoverUrl() ?? '',
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                errorWidget: (context, url, error) =>
+                                    Container(),
+                              ),
+                              builder: (context, child) {
+                                return Transform.rotate(
+                                  angle: rotationController.value * 2 * pi,
+                                  child: child,
+                                );
+                              },
                             ),
-                            builder: (context, child) {
-                              return Transform.rotate(
-                                angle: rotationController.value * 2 * pi,
-                                child: child,
-                              );
-                            },
-                          ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Song Name
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      hasSong
-                          ? currentSong.value!.fetchSongName() ?? ''
-                          : 'No song playing',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: hasSong ? Colors.white : Colors.grey,
+                const SizedBox(width: 8),
+                // Song Name
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        hasSong
+                            ? currentSong.value!.fetchSongName() ?? ''
+                            : 'No song playing',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: hasSong ? Colors.white : Colors.grey,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              if (hasSong) ...[
-                SizedBox(
-                    width: 30,
-                    child: IconButton(
+                if (hasSong) ...[
+                  SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: Center(
+                      child: IconButton(
                         color: Colors.pink[200],
+                        iconSize: 24,
                         icon: Icon(
                             playState.value == PlayerState.playing
                                 ? Icons.pause
                                 : Icons.play_arrow,
-                            size: 24,
                             color: Colors.white),
-                        onPressed: () {
-                          if (currentSong.value != null) {
-                            PlayerManager().play(currentSong.value!);
-                          }
-                        })),
-                const SizedBox(width: 2),
-              ],
-              SizedBox(
-                width: 30,
-                child: IconButton(
-                  color: Colors.pink[200],
-                  icon: Icon(
-                    Icons.menu,
-                    size: 24,
-                    color: hasSong ? Colors.white : Colors.transparent,
+                        onPressed: () =>
+                            _playButtonTap(context, currentSong.value),
+                      ),
+                    ),
                   ),
-                  onPressed: () {
-                    if (playlistOnTap != null) {
-                      playlistOnTap!();
-                    }
-
-                    // 自定义过渡动效，设置路由页面背景透明
-                    // Navigator.push(
-                    //     context,
-                    //     PageRouteBuilder(
-                    //         opaque: false,
-                    //         barrierColor: Colors.transparent,
-                    //         fullscreenDialog: true,
-                    //         pageBuilder:
-                    //             (context, animation, secondaryAnimation) {
-                    //           return const PlaylistPage();
-                    //         },
-                    //         transitionsBuilder: (context, animation,
-                    //             secondaryAnimation, child) {
-                    //           // 实现过渡动效（上下移动）
-                    //           const begin = Offset(0.0, 1.0);
-                    //           const end = Offset.zero;
-                    //           const curve = Curves.ease;
-                    //
-                    //           final tween = Tween(begin: begin, end: end)
-                    //               .chain(CurveTween(curve: curve));
-                    //
-                    //           return SlideTransition(
-                    //             position: animation.drive(tween),
-                    //             child: child,
-                    //           );
-                    //         }));
-                  },
+                  // const SizedBox(width: 2),
+                ],
+                SizedBox(
+                  height: 40,
+                  width: 40,
+                  child: Center(
+                    child: IconButton(
+                      color: Colors.pink[200],
+                      iconSize: 24,
+                      icon: Icon(
+                        Icons.menu,
+                        color: hasSong ? Colors.white : Colors.transparent,
+                      ),
+                      onPressed: () => _playListButtonTap(context),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _viewTap(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        fullscreenDialog: true,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return const PlaylistPage();
+        },
+      ),
+    );
+  }
+
+  void _playButtonTap(BuildContext context, MusicProvider? song) {
+    if (song != null) {
+      PlayerManager().play(song);
+    }
+  }
+
+  void _playListButtonTap(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        fullscreenDialog: true,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return const PlaylistPage();
+        },
+      ),
+    );
+
+    // 自定义过渡动效，设置路由页面背景透明
+    // Navigator.push(
+    //     context,
+    //     PageRouteBuilder(
+    //         opaque: false,
+    //         barrierColor: Colors.transparent,
+    //         fullscreenDialog: true,
+    //         pageBuilder:
+    //             (context, animation, secondaryAnimation) {
+    //           return const PlaylistPage();
+    //         },
+    //         transitionsBuilder: (context, animation,
+    //             secondaryAnimation, child) {
+    //           // 实现过渡动效（上下移动）
+    //           const begin = Offset(0.0, 1.0);
+    //           const end = Offset.zero;
+    //           const curve = Curves.ease;
+    //
+    //           final tween = Tween(begin: begin, end: end)
+    //               .chain(CurveTween(curve: curve));
+    //
+    //           return SlideTransition(
+    //             position: animation.drive(tween),
+    //             child: child,
+    //           );
+    //         }));
   }
 }
