@@ -11,6 +11,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SpUtil.init();
 
+  await UserManager.init();
+
   runApp(const MyApp());
 }
 
