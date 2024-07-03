@@ -26,7 +26,7 @@ class PlaylistPageLogic extends GetxController {
       if (playHash != null) {
         playedList.add(playHash);
       }
-      // update();
+      update();
     }
 
     // 监听播放音乐
