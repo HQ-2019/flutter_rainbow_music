@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_rainbow_music/base/loading/loading.dart';
 import 'package:flutter_rainbow_music/base/utils/router_observer_util.dart';
+import 'package:flutter_rainbow_music/base/utils/sp_util.dart';
+import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
 import 'package:flutter_rainbow_music/views/pages/tabbar/tabbar_page.dart';
 
-void main() {
+void main() async {
+  // 将main方法改成async, 提前初始化SharedPreferences，尽量避免使用时报未初始化错误
+  WidgetsFlutterBinding.ensureInitialized();
+  await SpUtil.init();
+
   runApp(const MyApp());
 }
 
