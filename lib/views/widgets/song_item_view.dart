@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
-import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
+import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
 
 class SongItemView extends StatelessWidget {
   final String coverUrl;
@@ -62,18 +61,35 @@ class SongItemView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5),
                 child: Container(
                   color: Colors.white70,
-                  child: CachedNetworkImage(
-                    imageUrl: coverUrl,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(
-                          color: Colors.pink.shade100, strokeWidth: 1),
-                    ),
-                    errorWidget: (context, error, stackTrace) => const Icon(
-                        Icons.broken_image,
-                        size: 50,
-                        color: Colors.black12),
+                  height: double.infinity,
+                  child: Stack(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: coverUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(
+                              color: Colors.pink.shade100, strokeWidth: 1),
+                        ),
+                        errorWidget: (context, error, stackTrace) => const Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.black12),
+                      ),
+                      if (isSelected) ...[
+                        Container(
+                          height: double.infinity,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                          ),
+                          child: const AudioBarsAnimation(
+                            itemCount: 1,
+                          ),
+                        )
+                      ],
+                    ],
                   ),
                 ),
               ),

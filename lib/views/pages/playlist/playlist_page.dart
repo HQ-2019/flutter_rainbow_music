@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
 import 'package:flutter_rainbow_music/base/utils/router_observer_util.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
 import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
@@ -201,9 +202,8 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
             top: 0,
             left: 0,
             right: 0,
-            child: Container(
+            child: SizedBox(
               height: 49,
-              // color: Colors.yellow,
               child: DefaultTabController(
                   length: 3,
                   child: TabBar(
@@ -301,7 +301,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
     );
   }
 
-  Tab _tabView({Icon? icon, String? text, Widget? child}) {
+  Tab _tabView({Icon? icon, String? text}) {
     return Tab(
       icon: icon,
       iconMargin: EdgeInsets.zero,
@@ -345,15 +345,35 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                   borderRadius: BorderRadius.circular(5),
                   child: Container(
                     color: Colors.white70,
-                    child: CachedNetworkImage(
-                      imageUrl: model.fetchCoverUrl() ?? '',
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(
-                              color: Colors.pink[100], strokeWidth: 1)),
-                      errorWidget: (context, error, stackTrace) =>
-                          const Icon(Icons.broken_image, color: Colors.black12),
+                    height: double.infinity,
+                    child: Stack(
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: model.fetchCoverUrl() ?? '',
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(
+                                  color: Colors.pink[100], strokeWidth: 1)),
+                          errorWidget: (context, error, stackTrace) =>
+                              const Icon(Icons.broken_image,
+                                  color: Colors.black12),
+                        ),
+                        if (model.fetchIsSelected()) ...[
+                          Container(
+                            height: double.infinity,
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                            child: const AudioBarsAnimation(
+                              itemCount: 3,
+                              itemWidth: 2,
+                              maxHeight: 15,
+                            ),
+                          )
+                        ],
+                      ],
                     ),
                   )),
             ),
