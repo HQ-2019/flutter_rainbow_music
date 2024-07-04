@@ -23,7 +23,10 @@ class SongItemModel implements MusicProvider {
     songName = json['song_name'];
     coverUrl = json['album_sizable_cover']?.replaceAll('/{size}', '');
     payType = json['pay_type'];
-    songDetail = json['song_detail'];
+    final detail = json['song_detail'];
+    if (detail != null) {
+      songDetail = SongInfoModel.fromJson(detail);
+    }
   }
 
   SongItemModel.fromSpecialJson(dynamic json) {
@@ -41,7 +44,10 @@ class SongItemModel implements MusicProvider {
       }
     }
     payType = json['pay_type'];
-    songDetail = json['song_detail'];
+    final detail = json['song_detail'];
+    if (detail != null) {
+      songDetail = SongInfoModel.fromJson(detail);
+    }
   }
 
   static List<SongItemModel> fromJsonList(List<dynamic> jsonList) {
@@ -129,6 +135,11 @@ class SongItemModel implements MusicProvider {
   @override
   void updateSelected(bool selected) {
     isSelected = selected;
+  }
+
+  @override
+  MusicProvider clone() {
+    return SongItemModel.fromJson(toJson());
   }
 }
 

@@ -14,4 +14,6 @@ abstract class MusicProvider {
   void updateSongDetail(SongInfoModel value);
   void updatePlayState(PlayerState state);
   void updateSelected(bool selected);
+
+  MusicProvider clone();
 }

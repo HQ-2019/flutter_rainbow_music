@@ -10,7 +10,6 @@ import 'package:flutter_rainbow_music/base/extension/string.dart';
 import 'package:flutter_rainbow_music/base/widgets/custom_sliver_persistent_header_delegate.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
 import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
-import 'package:flutter_rainbow_music/model/rank_item_model.dart';
 import 'package:flutter_rainbow_music/model/song_item_model.dart';
 import 'package:flutter_rainbow_music/model/special_item_model.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';

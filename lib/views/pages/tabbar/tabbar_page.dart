@@ -67,7 +67,7 @@ class _TabBarPageState extends State<TabBarPage> with RouteAware {
     });
 
     _playlistPageSubscription =
-        eventBus.on<PlaylistPageVisibleEvent>().listen((event) {
+        eventBus.on<PlayViewVisibleEvent>().listen((event) {
       if (_bottomViewIsVisible == event.isVisible) {
         setState(() {
           _bottomViewIsVisible = !event.isVisible;

@@ -13,7 +13,9 @@ import 'package:flutter_rainbow_music/views/pages/playlist/logic.dart';
 import 'package:get/get.dart';
 
 class PlaylistPage extends StatefulWidget {
-  const PlaylistPage({super.key});
+  const PlaylistPage({super.key, this.updatePlayViewVisible = true});
+
+  final bool updatePlayViewVisible;
 
   @override
   State<StatefulWidget> createState() => _PlaylistPageState();
@@ -21,7 +23,7 @@ class PlaylistPage extends StatefulWidget {
 
 class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
   Color _color = Colors.transparent;
-  final logic = Get.put(PlaylistPageLogic());
+  final _logic = Get.put(PlaylistPageLogic());
   bool _isEditing = false;
   final ScrollController _scrollController = ScrollController();
 
@@ -36,7 +38,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
 
   // 滚动到当前播放的歌曲
   void _scrollToPlaySong() {
-    final index = logic.playSongIndex();
+    final index = _logic.playSongIndex();
     if (index > 7) {
       _scrollController.jumpTo(index * 40.0);
     }
@@ -62,7 +64,9 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
       setState(() {
         _color = Colors.black.withOpacity(0.5);
       });
-      eventBus.fire(PlaylistPageVisibleEvent(true));
+      if (widget.updatePlayViewVisible) {
+        eventBus.fire(PlayViewVisibleEvent(true));
+      }
     });
   }
 
@@ -72,7 +76,9 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
     setState(() {
       _color = Colors.transparent;
     });
-    eventBus.fire(PlaylistPageVisibleEvent(false));
+    if (widget.updatePlayViewVisible) {
+      eventBus.fire(PlayViewVisibleEvent(false));
+    }
   }
 
   @override
@@ -228,7 +234,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                         // 下载
                       } else if (index == 1) {
                         // 删除
-                        logic.removePlaylist();
+                        _logic.removePlaylist();
                       } else {
                         setState(() {
                           _isEditing = false;
@@ -238,19 +244,27 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                     tabs: !_isEditing
                         ? [
                             _tabView(
-                                text: '顺序', icon: const Icon(Icons.repeat)),
+                              text: PlayerManager().fetchPlayModeText(),
+                              icon: Icon(
+                                PlayerManager().fetchPlayModeIcon(),
+                              ),
+                            ),
                             _tabView(text: '编辑', icon: const Icon(Icons.edit)),
                             _tabView(
-                                text: '收起',
-                                icon: const Icon(Icons.keyboard_arrow_down,
-                                    size: 30)),
+                              text: '收起',
+                              icon: const Icon(Icons.keyboard_arrow_down,
+                                  size: 30),
+                            ),
                           ]
                         : [
                             _tabView(
-                                text: '下载', icon: const Icon(Icons.download)),
+                              text: '下载',
+                              icon: const Icon(Icons.download),
+                            ),
                             _tabView(
-                                text: '删除',
-                                icon: const Icon(Icons.delete_forever)),
+                              text: '删除',
+                              icon: const Icon(Icons.delete_forever),
+                            ),
                             _tabView(
                               text: '完成',
                             ),
@@ -290,7 +304,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                           : Colors.black87)),
               onTap: () {
                 setState(() {
-                  PlayerManager().updatePlaybackModel(mode);
+                  PlayerManager().changePlaybackModel(model: mode);
                 });
                 Navigator.pop(context);
               },
@@ -316,7 +330,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
     return GestureDetector(
       onTap: () {
         if (_isEditing) {
-          logic.updateSelectedList(model.fetchHash());
+          _logic.updateSelectedList(model.fetchHash());
           return;
         }
         PlayerManager().playList(song: model);
@@ -334,7 +348,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                   value: isSelected,
                   activeColor: Colors.pinkAccent,
                   onChanged: (value) {
-                    logic.updateSelectedList(model.fetchHash());
+                    _logic.updateSelectedList(model.fetchHash());
                   }),
             ] else ...[
               const SizedBox(width: 14),
@@ -444,7 +458,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
                     size: 20,
                   ),
                   onPressed: () {
-                    logic.removeSong(model);
+                    _logic.removeSong(model);
                   },
                 ),
               )

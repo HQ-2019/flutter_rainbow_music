@@ -11,6 +11,7 @@ import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dar
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_rainbow_music/views/pages/playlist/playlist_page.dart';
+import 'package:flutter_rainbow_music/views/pages/song_play/song_play.dart';
 
 /// 音乐播放视图，HookWidget是StatefulWidget替代方案
 class PlayerView extends HookWidget {
@@ -160,7 +161,6 @@ class PlayerView extends HookWidget {
                     width: 40,
                     child: Center(
                       child: IconButton(
-                        color: Colors.pink[200],
                         iconSize: 24,
                         icon: Icon(
                             playState.value == PlayerState.playing
@@ -179,10 +179,9 @@ class PlayerView extends HookWidget {
                   width: 40,
                   child: Center(
                     child: IconButton(
-                      color: Colors.pink[200],
                       iconSize: 24,
                       icon: Icon(
-                        Icons.menu,
+                        Icons.queue_music,
                         color: hasSong ? Colors.white : Colors.transparent,
                       ),
                       onPressed: () => _playListButtonTap(context),
@@ -200,13 +199,9 @@ class PlayerView extends HookWidget {
   void _viewTap(BuildContext context) {
     Navigator.push(
       context,
-      PageRouteBuilder(
-        opaque: false,
-        barrierColor: Colors.transparent,
+      CupertinoPageRoute(
         fullscreenDialog: true,
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return const PlaylistPage();
-        },
+        builder: (context) => const SongPlayPage(),
       ),
     );
   }

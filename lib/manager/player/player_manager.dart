@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rainbow_music/api/api.dart';
 import 'package:flutter_rainbow_music/base/network/http_response_model.dart';
 import 'package:flutter_rainbow_music/base/network/network_manager.dart';
@@ -45,7 +46,11 @@ class PlayerManager {
   // 当前选择的音乐
   MusicProvider? _currentSong;
   MusicProvider? get currentSong => _currentSong;
-  double? _timeLenght;
+
+  MusicProvider? _lastSong;
+
+  int? _timeLenght;
+  int? get timeLenght => _timeLenght;
 
   void _init() {
     _player.setReleaseMode(ReleaseMode.stop);
@@ -70,15 +75,15 @@ class PlayerManager {
     _playerDurationChangeSubscription =
         _player.onDurationChanged.listen((event) {
       print("时长 $event");
-      _timeLenght = event.inMilliseconds.toDouble();
+      _timeLenght = event.inSeconds;
     });
 
     // 监听播放进度
     _playerPositionChangeSubscription =
         _player.onPositionChanged.listen((event) {
       if (_timeLenght != null) {
-        final progress = event.inMilliseconds / _timeLenght!;
-        eventBus.fire(MusicPlayProgressEvent(progress));
+        final progress = event.inSeconds.toDouble() / _timeLenght!;
+        eventBus.fire(MusicPlayProgressEvent(progress, event.inSeconds));
       }
     });
   }
@@ -90,8 +95,46 @@ class PlayerManager {
     _playerPositionChangeSubscription?.cancel();
   }
 
-  void updatePlaybackModel(PlaybackMode model) {
-    _playbackModel = model;
+  void changePlaybackModel({PlaybackMode? model}) {
+    if (model != null) {
+      _playbackModel = model;
+      return;
+    }
+
+    // 按顺序改变播放模式
+    switch (_playbackModel) {
+      case PlaybackMode.sequential:
+        _playbackModel = PlaybackMode.shuffle;
+        break;
+      case PlaybackMode.shuffle:
+        _playbackModel = PlaybackMode.repeatOne;
+        break;
+      case PlaybackMode.repeatOne:
+        _playbackModel = PlaybackMode.sequential;
+        break;
+    }
+  }
+
+  IconData fetchPlayModeIcon() {
+    switch (PlayerManager().playbackModel) {
+      case PlaybackMode.sequential:
+        return Icons.repeat;
+      case PlaybackMode.shuffle:
+        return Icons.shuffle;
+      case PlaybackMode.repeatOne:
+        return Icons.repeat_one;
+    }
+  }
+
+  String fetchPlayModeText() {
+    switch (PlayerManager().playbackModel) {
+      case PlaybackMode.sequential:
+        return '顺序';
+      case PlaybackMode.shuffle:
+        return '随机';
+      case PlaybackMode.repeatOne:
+        return '单曲循环';
+    }
   }
 
   void updatePlaylistSource(String? source) {
@@ -122,6 +165,7 @@ class PlayerManager {
     _playlist.clear();
     _playlistSource = null;
     _currentSong = null;
+    _lastSong = null;
     _timeLenght = null;
   }
 
@@ -141,6 +185,23 @@ class PlayerManager {
       playNext();
     }
     _playlist.remove(song);
+  }
+
+  /// 播放上一首
+  void playlast() {
+    if (_lastSong != null) {
+      play(_lastSong!);
+      return;
+    }
+
+    if (_currentSong?.fetchHash() == null) {
+      play(_playlist.first);
+      return;
+    }
+
+    int index = _playlist.indexWhere(
+        (element) => element.fetchHash() == _currentSong!.fetchHash());
+    play(_playlist[max(0, index - 1)]);
   }
 
   /// 播放下一首
@@ -192,6 +253,9 @@ class PlayerManager {
 
   /// 播放歌曲
   void play(MusicProvider song) {
+    if (_currentSong != null && _currentSong != song) {
+      _lastSong = _currentSong!.clone();
+    }
     if (_currentSong == null || _currentSong?.fetchHash() != song.fetchHash()) {
       _currentSong = song;
       eventBus.fire(MusicPlayEvent(song));

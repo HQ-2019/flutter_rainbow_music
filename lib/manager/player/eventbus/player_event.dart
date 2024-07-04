@@ -21,5 +21,6 @@ class MusicPlaySateEvent extends MusicEvent {
 /// 音乐播放进度回调事件
 class MusicPlayProgressEvent {
   final double progress;
-  MusicPlayProgressEvent(this.progress);
+  final int time;
+  MusicPlayProgressEvent(this.progress, this.time);
 }

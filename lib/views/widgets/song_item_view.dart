@@ -85,7 +85,7 @@ class SongItemView extends StatelessWidget {
                             color: Colors.black.withOpacity(0.5),
                           ),
                           child: const AudioBarsAnimation(
-                            itemCount: 1,
+                            itemCount: 3,
                           ),
                         )
                       ],
