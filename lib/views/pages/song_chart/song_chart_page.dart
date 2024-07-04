@@ -11,6 +11,7 @@ import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dar
 import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
 import 'package:flutter_rainbow_music/model/rank_item_model.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
+import 'package:flutter_rainbow_music/model/song_item_model.dart';
 import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
 import 'package:flutter_rainbow_music/views/pages/song_chart/logic.dart';
 import 'package:flutter_rainbow_music/views/widgets/song_item_view.dart';
@@ -143,7 +144,7 @@ class _SongChartPageState extends State<SongChartPage>
     );
   }
 
-  Widget _sliverPersistentHeader(List<RankSongItemModel>? songs) {
+  Widget _sliverPersistentHeader(List<SongItemModel>? songs) {
     return SliverPersistentHeader(
       pinned: true,
       delegate: CustomSliverPersistentHeaderDelegate(
@@ -201,7 +202,7 @@ class _SongChartPageState extends State<SongChartPage>
     );
   }
 
-  Widget _listView(List<RankSongItemModel>? songs) {
+  Widget _listView(List<SongItemModel>? songs) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {

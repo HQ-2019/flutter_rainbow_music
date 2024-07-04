@@ -79,13 +79,13 @@ class RankItemView extends StatelessWidget {
                                         ),
                                         children: [
                                           TextSpan(
-                                            text: songModel.songname,
+                                            text: songModel.songName,
                                             style: const TextStyle(
                                               color: Colors.black,
                                             ),
                                           ),
                                           TextSpan(
-                                            text: ' - ${songModel.singername}',
+                                            text: ' - ${songModel.singerName}',
                                           ),
                                         ],
                                       ),

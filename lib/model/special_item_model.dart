@@ -1,4 +1,5 @@
 import 'package:flutter_rainbow_music/model/rank_item_model.dart';
+import 'package:flutter_rainbow_music/model/song_item_model.dart';
 
 /// 专属歌单
 class SpecialItemModel {
@@ -35,11 +36,9 @@ class SpecialItemModel {
     isSelected = json['is_selected'];
     intro = json['intro'];
     imgurl = json['imgurl']?.replaceAll('/{size}', '');
-    if (json['songs'] != null) {
-      songs = [];
-      json['songs'].forEach((v) {
-        songs?.add(RankSongItemModel.fromJson(v));
-      });
+    final songList = json['songs'];
+    if (songList != null) {
+      songs = SongItemModel.fromSpecialJsonList(songList);
     }
   }
 
@@ -61,7 +60,7 @@ class SpecialItemModel {
   int? isSelected;
   String? intro;
   String? imgurl;
-  List<RankSongItemModel>? songs;
+  List<SongItemModel>? songs;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

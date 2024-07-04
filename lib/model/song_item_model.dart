@@ -5,31 +5,42 @@ import 'package:flutter_rainbow_music/model/song_info_model.dart';
 /// 新歌推荐
 class SongItemModel implements MusicProvider {
   SongItemModel(
-      {this.rankCount,
-      this.feetype,
-      this.hash,
+      {this.hash,
       this.mvhash,
-      this.recommendReason,
-      this.payType,
       this.singerName,
       this.songName,
-      this.album_sizable_cover,
+      this.coverUrl,
       this.playProgress = 0.0,
+      this.payType,
       this.isSelected = false,
       this.playState = PlayerState.stopped,
       this.songDetail});
 
   SongItemModel.fromJson(dynamic json) {
-    rankCount = json['rank_count'];
-    feetype = json['feetype'];
     hash = json['hash'];
     mvhash = json['mvhash'];
-    recommendReason = json['recommend_reason'];
-    payType = json['pay_type'];
     singerName = json['singer_name'];
     songName = json['song_name'];
-    album_sizable_cover =
-        json['album_sizable_cover']?.replaceAll('/{size}', '');
+    coverUrl = json['album_sizable_cover']?.replaceAll('/{size}', '');
+    payType = json['pay_type'];
+    songDetail = json['song_detail'];
+  }
+
+  SongItemModel.fromSpecialJson(dynamic json) {
+    hash = json['trans_param']?['ogg_320_hash'] ?? json['hash'];
+    mvhash = json['mvhash'];
+    singerName = json['author'] ?? json['h5_author_name'] ?? json['singername'];
+    songName = json['name'] ?? json['songname'];
+    coverUrl = json['album_sizable_cover']?.replaceAll('/{size}', '');
+    var authors = json['authors'];
+    if (coverUrl == null && authors is List) {
+      List<dynamic> authorList = authors;
+      if (authorList.isNotEmpty && authorList.first is Map) {
+        coverUrl =
+            authorList.first['sizable_avatar']?.replaceAll('/{size}', '');
+      }
+    }
+    payType = json['pay_type'];
     songDetail = json['song_detail'];
   }
 
@@ -37,15 +48,16 @@ class SongItemModel implements MusicProvider {
     return jsonList.map((json) => SongItemModel.fromJson(json)).toList();
   }
 
-  num? rankCount;
-  num? feetype;
+  static List<SongItemModel> fromSpecialJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => SongItemModel.fromSpecialJson(json)).toList();
+  }
+
   String? hash;
   String? mvhash;
-  String? recommendReason;
-  num? payType;
   String? singerName;
   String? songName;
-  String? album_sizable_cover;
+  String? coverUrl;
+  num? payType;
 
   double playProgress = 0.0;
   bool isSelected = false;
@@ -54,23 +66,19 @@ class SongItemModel implements MusicProvider {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['rank_count'] = rankCount;
-    map['feetype'] = feetype;
     map['hash'] = hash;
     map['mvhash'] = mvhash;
-    map['recommend_reason'] = recommendReason;
-    map['pay_type'] = payType;
     map['singer_name'] = singerName;
     map['song_name'] = songName;
-    map['album_sizable_cover'] = album_sizable_cover;
+    map['album_sizable_cover'] = coverUrl;
+    map['pay_type'] = payType;
     map['song_detail'] = songDetail?.toJson();
-    map['playProgress'] = playProgress;
     return map;
   }
 
   @override
   String? fetchCoverUrl() {
-    return album_sizable_cover;
+    return coverUrl;
   }
 
   @override
@@ -126,6 +134,6 @@ class SongItemModel implements MusicProvider {
 
 extension RecommendSongItemModelExtension on SongItemModel {
   String? getCover() {
-    return album_sizable_cover?.replaceAll('/{}', '');
+    return coverUrl?.replaceAll('/{}', '');
   }
 }
