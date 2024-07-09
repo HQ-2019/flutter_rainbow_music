@@ -188,22 +188,25 @@ class _TabBarPageState extends State<TabBarPage> with RouteAware {
                     children: [
                       DefaultTabController(
                         length: _barItemList.length,
-                        child: TabBar(
-                          tabs: _barItemList,
-                          padding: EdgeInsets.zero,
-                          labelColor: Colors.pinkAccent,
-                          labelStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                        child: SizedBox(
+                          height: 49,
+                          child: TabBar(
+                            tabs: _barItemList,
+                            padding: EdgeInsets.zero,
+                            labelColor: Colors.pinkAccent,
+                            labelStyle: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            unselectedLabelColor: Colors.black54,
+                            indicatorColor: Colors.transparent,
+                            dividerHeight: 0,
+                            onTap: (index) {
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
                           ),
-                          unselectedLabelColor: Colors.black54,
-                          indicatorColor: Colors.transparent,
-                          dividerHeight: 0,
-                          onTap: (index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
                         ),
                       ),
                       // BottomNavigationBar(
