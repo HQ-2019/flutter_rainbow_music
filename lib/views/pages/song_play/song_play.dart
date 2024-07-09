@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rainbow_music/base/utils/color_util.dart';
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
@@ -30,7 +31,6 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
   final _logic = Get.put(SongPlayPageLogic());
   final ValueNotifier<double> _progress = ValueNotifier<double>(0.0);
   final ValueNotifier<int> _playTime = ValueNotifier<int>(0);
-  final _backgroundColor = ColorUtil.randomDarkColor();
   PlayerState _playState = PlayerState.playing;
 
   StreamSubscription? _playStateSubscription;
@@ -102,13 +102,13 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
           final song = logic.song;
           return Stack(
             children: [
-              _backgroundView(song?.fetchCoverUrl() ?? ''),
+              _backgroundView(song),
               Column(
                 children: [
                   Expanded(
                     child: _songInfoView(song),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 10),
                   _playControlView(song),
                 ],
               ),
@@ -119,21 +119,27 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
     );
   }
 
-  Widget _backgroundView(String imageUrl) {
+  Widget _backgroundView(MusicProvider? song) {
+    final imageUrl = song?.fetchCoverUrl() ?? '';
+    final themeColor = song?.fetchThemeColor() ?? ColorUtil.randomDarkColor();
     return Stack(
       children: [
-        CachedNetworkImage(
-          imageUrl: imageUrl,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          errorWidget: (context, error, stackTrace) =>
-              Container(color: Colors.transparent),
+        Container(
+          color: themeColor,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            useOldImageOnUrlChange: true,
+            errorWidget: (context, error, stackTrace) =>
+                Container(color: Colors.transparent),
+          ),
         ),
         BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
-            color: _backgroundColor.withOpacity(0.8),
+            color: themeColor.withOpacity(0.85),
           ),
         ),
       ],
@@ -141,63 +147,62 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
   }
 
   Widget _songInfoView(MusicProvider? song) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 50),
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(left: 60, right: 60, top: 30),
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 20,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  // borderRadius: BorderRadius.circular(5),
-                  child: Container(
-                    height: double.infinity,
-                    color: Colors.white70,
-                    child: CachedNetworkImage(
-                      imageUrl: song?.fetchCoverUrl() ?? '',
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Center(
-                        child: CircularProgressIndicator(
-                            color: Colors.pink.shade100, strokeWidth: 1),
+    final themeColor = song?.fetchThemeColor() ?? ColorUtil.randomDarkColor();
+    return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 50),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 60, right: 60, top: 30),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black54,
+                        blurRadius: 20,
+                        offset: Offset(0, 0),
                       ),
-                      errorWidget: (context, error, stackTrace) =>
-                          Container(color: Colors.white70),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Container(
+                      height: double.infinity,
+                      color: themeColor,
+                      child: CachedNetworkImage(
+                        imageUrl: song?.fetchCoverUrl() ?? '',
+                        fit: BoxFit.cover,
+                        useOldImageOnUrlChange: true,
+                        errorWidget: (context, error, stackTrace) => Container(
+                          color: themeColor,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 30),
-          Text(
-            song?.fetchSongName() ?? '歌曲',
-            style: const TextStyle(color: Colors.white, fontSize: 24),
-          ),
-          Text(
-            song?.fetchSingerName() ?? '',
-            style: const TextStyle(color: Colors.white54, fontSize: 14),
-          ),
-          const SizedBox(height: 20),
-          const Expanded(
-            child: Text(
+            const SizedBox(height: 20),
+            Text(
+              song?.fetchSongName() ?? '歌曲',
+              style: const TextStyle(color: Colors.white, fontSize: 24),
+            ),
+            Text(
+              song?.fetchSingerName() ?? '',
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
+            ),
+            const SizedBox(height: 20),
+            const Text(
               '暂无歌词',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

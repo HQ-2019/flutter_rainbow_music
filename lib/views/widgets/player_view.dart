@@ -37,7 +37,6 @@ class PlayerView extends HookWidget {
     final progress = useState(0.0);
     final playState = useState(currentSong.value?.fetchPlayState());
     final hasSong = currentSong.value != null;
-    final backgroundColor = useState<Color>(ColorUtil.randomDarkColor());
 
     final rotationController = useAnimationController(
       duration: const Duration(seconds: 8),
@@ -46,7 +45,6 @@ class PlayerView extends HookWidget {
     useEffect(() {
       final songSubscription = eventBus.on<MusicPlayEvent>().listen((event) {
         currentSong.value = event.musicProvider;
-        backgroundColor.value = ColorUtil.randomDarkColor();
       });
 
       final stateSubscription =
@@ -85,7 +83,8 @@ class PlayerView extends HookWidget {
         decoration: decoration ??
             BoxDecoration(
               borderRadius: BorderRadius.circular(6),
-              color: backgroundColor.value,
+              color: currentSong.value?.fetchThemeColor() ??
+                  ColorUtil.randomDarkColor(),
             ),
         child: Stack(
           children: [

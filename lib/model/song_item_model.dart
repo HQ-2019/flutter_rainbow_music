@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_rainbow_music/base/utils/color_util.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
 import 'package:flutter_rainbow_music/model/song_info_model.dart';
 
@@ -69,6 +72,7 @@ class SongItemModel implements MusicProvider {
   bool isSelected = false;
   PlayerState playState = PlayerState.stopped;
   SongInfoModel? songDetail;
+  Color themeColor = ColorUtil.randomDarkColor();
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -120,6 +124,11 @@ class SongItemModel implements MusicProvider {
   @override
   PlayerState fetchPlayState() {
     return playState;
+  }
+
+  @override
+  Color fetchThemeColor() {
+    return themeColor;
   }
 
   @override
