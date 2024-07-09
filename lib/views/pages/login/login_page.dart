@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -67,9 +69,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() {
-    final userModel = UserModel(phone: _phoneController.text);
-    UserManager().updateUserInfo(userModel);
-    UserManager().saveUserInfoLocal();
+    final userModel = UserModel(
+        phone: _phoneController.text,
+        nickname: '彩虹音乐${Random().nextInt(1000000) + 10000}');
+    UserManager().login(userModel);
 
     Navigator.pop(context);
   }

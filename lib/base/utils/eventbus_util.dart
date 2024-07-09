@@ -8,3 +8,9 @@ class PlayViewVisibleEvent {
   final bool isVisible;
   PlayViewVisibleEvent(this.isVisible);
 }
+
+/// 登录状态变更通知
+class LoginStateEvent {
+  final bool isLogin;
+  LoginStateEvent(this.isLogin);
+}

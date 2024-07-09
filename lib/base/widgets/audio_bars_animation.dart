@@ -25,7 +25,7 @@ class AudioBarsAnimation extends StatefulWidget {
 }
 
 class _AudioBarsAnimationState extends State<AudioBarsAnimation>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late List<AnimationController> _controllers;
   late List<Animation<double>> _animations;
   late List<double> _heights;
@@ -59,10 +59,10 @@ class _AudioBarsAnimationState extends State<AudioBarsAnimation>
       return Tween<double>(
         begin: _heights[index],
         end: _getRandomHeight(),
-      ).animate(_controllers[index])
-        ..addListener(() {
-          setState(() {});
-        });
+      ).animate(_controllers[index]);
+      // ..addListener(() {
+      //   setState(() {});
+      // });
     });
 
     for (var controller in _controllers) {

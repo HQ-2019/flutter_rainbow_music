@@ -1,3 +1,4 @@
+import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
 import 'package:flutter_rainbow_music/base/utils/sp_util.dart';
 import 'package:flutter_rainbow_music/model/user_model.dart';
 
@@ -23,6 +24,17 @@ class UserManager {
     return UserManager().userModel == null ? false : true;
   }
 
+  void login(UserModel userInfo) {
+    updateUserInfo(userInfo);
+    saveUserInfoLocal();
+    eventBus.fire(LoginStateEvent(true));
+  }
+
+  void logout() {
+    clearUserInfo();
+    eventBus.fire(LoginStateEvent(false));
+  }
+
   void saveUserInfoLocal() async {
     if (_userModel == null) {
       return;
@@ -32,6 +44,11 @@ class UserManager {
 
   void updateUserInfo(UserModel? userInfo) {
     _userModel = userInfo;
+  }
+
+  void clearUserInfo() {
+    updateUserInfo(null);
+    SpUtil().remove(userInfoKey);
   }
 
   void addFavoriteSong() {}
