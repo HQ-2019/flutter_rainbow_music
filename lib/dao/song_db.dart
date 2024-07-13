@@ -39,8 +39,8 @@ class SongDB {
       {
         'hash': song.hash,
         'mvhash': song.mvhash,
-        'song_name': song.mvhash,
-        'singer_name': song.mvhash,
+        'song_name': song.songName,
+        'singer_name': song.singerName,
         'album_sizable_cover': song.coverUrl,
         'pay_type': song.payType,
       },

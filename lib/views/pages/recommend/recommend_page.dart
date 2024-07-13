@@ -174,6 +174,7 @@ class _RecommendPageState extends State<RecommendPage>
                 songName: itemModel?.fetchSongName() ?? '--',
                 singerName: itemModel?.fetchSingerName() ?? '--',
                 isSelected: itemModel?.fetchIsSelected() ?? false,
+                isFavorite: UserManager().isFavoriteSong(itemModel?.hash),
                 onTap: () {
                   if (itemModel == null) {
                     return;
@@ -182,11 +183,13 @@ class _RecommendPageState extends State<RecommendPage>
                       song: itemModel, list: songs, source: '首页：新歌速递');
                 },
                 favoriteTap: () {
-                  if (UserManager.isLogin()) {
-                    UserManager().addFavoriteSong();
+                  if (itemModel == null) {
                     return;
                   }
-
+                  if (UserManager.isLogin()) {
+                    UserManager().updateFavoriteSong(itemModel);
+                    return;
+                  }
                   Navigator.push(
                     context,
                     CupertinoPageRoute(

@@ -14,6 +14,8 @@ import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
 import 'package:flutter_rainbow_music/manager/player/eventbus/player_event.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
+import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
+import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
 import 'package:flutter_rainbow_music/views/pages/playlist/playlist_page.dart';
 import 'package:flutter_rainbow_music/views/pages/song_play/logic.dart';
 import 'package:get/get.dart';
@@ -212,14 +214,62 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
       width: double.infinity,
       child: Column(
         children: [
-          const SizedBox(
+          SizedBox(
             width: double.infinity,
             height: 30,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: AudioBarsAnimation(
-                itemCount: 5,
-              ),
+            child: Stack(
+              children: [
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: AudioBarsAnimation(
+                    itemCount: 5,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Spacer(),
+                    SizedBox(
+                      width: 40,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        color: UserManager().isFavoriteSong(song?.fetchHash())
+                            ? Colors.pinkAccent
+                            : Colors.white70,
+                        icon: const Icon(
+                          Icons.favorite_border,
+                          size: 25,
+                        ),
+                        onPressed: () {
+                          if (UserManager.isLogin()) {
+                            _logic.updateFavoriteSong(song);
+                            return;
+                          }
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              fullscreenDialog: true,
+                              builder: (context) => const LoginPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 40,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        color: Colors.white70,
+                        icon: const Icon(
+                          Icons.file_download_outlined,
+                          size: 25,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                ),
+              ],
             ),
           ),
           Container(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rainbow_music/model/song_info_model.dart';
+import 'package:flutter_rainbow_music/model/song_detail_model.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 abstract class MusicProvider {
@@ -13,7 +13,7 @@ abstract class MusicProvider {
   PlayerState fetchPlayState();
   Color fetchThemeColor();
 
-  void updateSongDetail(SongInfoModel value);
+  void updateSongDetail(SongDetailModel value);
   void updatePlayState(PlayerState state);
   void updateSelected(bool selected);
 

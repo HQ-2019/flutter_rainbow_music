@@ -28,7 +28,8 @@ class SpUtil {
   /// 保存模型对象
   Future<void> saveModel<T>(String key, T model) async {
     final jsonString = json.encode(model);
-    await _prefs.setString(key, jsonString);
+    final result = await _prefs.setString(key, jsonString);
+    print('数据保存: ${result ? '成功' : '失败'}');
   }
 
   /// 获取模型对象

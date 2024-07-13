@@ -295,7 +295,7 @@ class _SpecialPageState extends State<SpecialPage>
         (BuildContext context, int index) {
           var itemModel = songs?[index];
           return Container(
-            // margin: const EdgeInsets.symmetric(vertical: 5),
+            margin: const EdgeInsets.symmetric(vertical: 0),
             child: SongItemView(
               ranking: index + 1,
               padding: const EdgeInsets.all(6),
@@ -303,6 +303,7 @@ class _SpecialPageState extends State<SpecialPage>
               songName: itemModel?.fetchSongName() ?? '--',
               singerName: itemModel?.fetchSingerName() ?? '--',
               isSelected: itemModel?.fetchIsSelected() ?? false,
+              isFavorite: UserManager().isFavoriteSong(itemModel?.hash),
               onTap: () {
                 if (itemModel != null) {
                   PlayerManager().playList(
@@ -312,11 +313,13 @@ class _SpecialPageState extends State<SpecialPage>
                 }
               },
               favoriteTap: () {
-                if (UserManager.isLogin()) {
-                  UserManager().addFavoriteSong();
+                if (itemModel == null) {
                   return;
                 }
-
+                if (UserManager.isLogin()) {
+                  UserManager().updateFavoriteSong(itemModel);
+                  return;
+                }
                 Navigator.push(
                   context,
                   CupertinoPageRoute(

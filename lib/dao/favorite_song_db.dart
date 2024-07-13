@@ -74,13 +74,22 @@ class FavoriteSongDB {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  static Future<void> addFavoriteSong(String phone, String songHash) async {
+  static Future<void> addFavoriteSong(
+      {required String phone,
+      required String songHash,
+      SongItemModel? song}) async {
     final db = await DatabaseManager().db;
     try {
       await db.insert(tableName, {'phone': phone, 'song_hash': songHash});
+      if (song != null) {
+        await SongDB.addSongInfo(song);
+      }
     } catch (e) {
       if (e is DatabaseException && e.isUniqueConstraintError()) {
-        // 插入重复数据异常，不需要做任何处理
+        // 插入重复数据异常
+        if (song != null) {
+          await SongDB.addSongInfo(song);
+        }
       } else {
         // 其他错误
         throw e;

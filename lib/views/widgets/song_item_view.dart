@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
+import 'package:flutter_rainbow_music/base/widgets/song_cover_image_view.dart';
 
 class SongItemView extends StatelessWidget {
   final String coverUrl;
   final String songName;
   final String singerName;
   final bool isSelected;
+  final bool isFavorite;
   final int? ranking;
   final double? borderRadius;
   final EdgeInsets? padding;
@@ -20,6 +22,7 @@ class SongItemView extends StatelessWidget {
     required this.songName,
     required this.singerName,
     required this.isSelected,
+    required this.isFavorite,
     this.ranking,
     this.borderRadius,
     this.padding,
@@ -55,45 +58,7 @@ class SongItemView extends StatelessWidget {
               ),
               const SizedBox(width: 10),
             ],
-            AspectRatio(
-              aspectRatio: 1,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: Container(
-                  color: Colors.white70,
-                  height: double.infinity,
-                  child: Stack(
-                    children: [
-                      CachedNetworkImage(
-                        imageUrl: coverUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(
-                              color: Colors.pink.shade100, strokeWidth: 1),
-                        ),
-                        errorWidget: (context, error, stackTrace) => const Icon(
-                            Icons.broken_image,
-                            size: 50,
-                            color: Colors.black12),
-                      ),
-                      if (isSelected) ...[
-                        Container(
-                          height: double.infinity,
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
-                          ),
-                          child: const AudioBarsAnimation(
-                            itemCount: 3,
-                          ),
-                        )
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            SongCoverImageView(coverUrl: coverUrl, showAudioBars: isSelected),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -118,8 +83,9 @@ class SongItemView extends StatelessWidget {
             SizedBox(
               width: 40,
               child: IconButton(
-                color: Colors.black26,
-                icon: const Icon(Icons.favorite_border),
+                icon: isFavorite
+                    ? const Icon(Icons.favorite, color: Colors.pinkAccent)
+                    : const Icon(Icons.favorite_border, color: Colors.black26),
                 onPressed: favoriteTap,
               ),
             ),

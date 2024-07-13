@@ -6,8 +6,10 @@ import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
 import 'package:flutter_rainbow_music/base/utils/router_observer_util.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
+import 'package:flutter_rainbow_music/base/widgets/song_cover_image_view.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
+import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
 import 'package:flutter_rainbow_music/views/pages/login/login_page.dart';
 import 'package:flutter_rainbow_music/views/pages/playlist/logic.dart';
 import 'package:get/get.dart';
@@ -353,43 +355,9 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
             ] else ...[
               const SizedBox(width: 14),
             ],
-            AspectRatio(
-              aspectRatio: 1,
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Container(
-                    color: Colors.white70,
-                    height: double.infinity,
-                    child: Stack(
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: model.fetchCoverUrl() ?? '',
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Center(
-                              child: CircularProgressIndicator(
-                                  color: Colors.pink[100], strokeWidth: 1)),
-                          errorWidget: (context, error, stackTrace) =>
-                              const Icon(Icons.broken_image,
-                                  color: Colors.black12),
-                        ),
-                        if (model.fetchIsSelected()) ...[
-                          Container(
-                            height: double.infinity,
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                            ),
-                            child: const AudioBarsAnimation(
-                              itemCount: 3,
-                              itemWidth: 2,
-                              maxHeight: 15,
-                            ),
-                          )
-                        ],
-                      ],
-                    ),
-                  )),
+            SongCoverImageView(
+              coverUrl: model.fetchCoverUrl() ?? '',
+              showAudioBars: model.fetchIsSelected(),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -420,12 +388,16 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
               SizedBox(
                 width: 40,
                 child: IconButton(
-                  color: Colors.black26,
-                  icon: const Icon(
-                    Icons.favorite_border,
-                    size: 20,
-                  ),
+                  icon: UserManager().isFavoriteSong(model.fetchHash())
+                      ? const Icon(Icons.favorite,
+                          color: Colors.pinkAccent, size: 20)
+                      : const Icon(Icons.favorite_border,
+                          color: Colors.black26, size: 20),
                   onPressed: () {
+                    if (UserManager.isLogin()) {
+                      _logic.updateFavoriteSong(model);
+                      return;
+                    }
                     Navigator.push(
                       context,
                       CupertinoPageRoute(

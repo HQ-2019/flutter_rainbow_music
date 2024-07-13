@@ -216,6 +216,7 @@ class _SongChartPageState extends State<SongChartPage>
               songName: itemModel?.fetchSongName() ?? '--',
               singerName: itemModel?.fetchSingerName() ?? '--',
               isSelected: itemModel?.fetchIsSelected() ?? false,
+              isFavorite: UserManager().isFavoriteSong(itemModel?.hash),
               onTap: () {
                 if (itemModel != null) {
                   PlayerManager().playList(
@@ -223,11 +224,13 @@ class _SongChartPageState extends State<SongChartPage>
                 }
               },
               favoriteTap: () {
-                if (UserManager.isLogin()) {
-                  UserManager().addFavoriteSong();
+                if (itemModel == null) {
                   return;
                 }
-
+                if (UserManager.isLogin()) {
+                  UserManager().updateFavoriteSong(itemModel);
+                  return;
+                }
                 Navigator.push(
                   context,
                   CupertinoPageRoute(

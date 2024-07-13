@@ -1,13 +1,13 @@
-import 'dart:async';
-
 import 'package:flutter_rainbow_music/base/loading/loading.dart';
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
 import 'package:flutter_rainbow_music/manager/player/eventbus/player_event.dart';
+import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
 import 'package:flutter_rainbow_music/model/recommend_model.dart';
 import 'package:flutter_rainbow_music/api/api.dart';
 import 'package:flutter_rainbow_music/base/network/http_response_model.dart';
 import 'package:flutter_rainbow_music/base/network/network_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
+import 'package:flutter_rainbow_music/model/song_item_model.dart';
 import 'package:get/get.dart';
 
 class RecommendPageLogic extends GetxController {
@@ -15,16 +15,19 @@ class RecommendPageLogic extends GetxController {
 
   bool isNewSongExpan = false;
 
-  StreamSubscription? playSubscription;
-
   @override
   void onReady() {
     super.onReady();
     fetchRecommendInfo(showLoading: true);
 
     // 监听播放音乐
-    playSubscription = eventBus.on<MusicPlayEvent>().listen((event) {
+    eventBus.on<MusicPlayEvent>().listen((event) {
       updatePlayingItem(event.musicProvider.fetchHash());
+    });
+
+    // 收藏歌曲变更监听
+    eventBus.on<FavoriteSongChangedEvent>().listen((event) {
+      update();
     });
   }
 

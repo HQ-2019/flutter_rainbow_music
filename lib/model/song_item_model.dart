@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_rainbow_music/base/utils/color_util.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
-import 'package:flutter_rainbow_music/model/song_info_model.dart';
+import 'package:flutter_rainbow_music/model/song_detail_model.dart';
 
 /// 新歌推荐
 class SongItemModel implements MusicProvider {
@@ -28,7 +28,7 @@ class SongItemModel implements MusicProvider {
     payType = json['pay_type'];
     final detail = json['song_detail'];
     if (detail != null) {
-      songDetail = SongInfoModel.fromJson(detail);
+      songDetail = SongDetailModel.fromJson(detail);
     }
   }
 
@@ -49,7 +49,7 @@ class SongItemModel implements MusicProvider {
     payType = json['pay_type'];
     final detail = json['song_detail'];
     if (detail != null) {
-      songDetail = SongInfoModel.fromJson(detail);
+      songDetail = SongDetailModel.fromJson(detail);
     }
   }
 
@@ -71,7 +71,7 @@ class SongItemModel implements MusicProvider {
   double playProgress = 0.0;
   bool isSelected = false;
   PlayerState playState = PlayerState.stopped;
-  SongInfoModel? songDetail;
+  SongDetailModel? songDetail;
   Color themeColor = ColorUtil.randomDarkColor();
 
   Map<String, dynamic> toJson() {
@@ -132,7 +132,7 @@ class SongItemModel implements MusicProvider {
   }
 
   @override
-  void updateSongDetail(SongInfoModel value) {
+  void updateSongDetail(SongDetailModel value) {
     songDetail = value;
   }
 

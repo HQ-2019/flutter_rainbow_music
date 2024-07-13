@@ -14,3 +14,9 @@ class LoginStateEvent {
   final bool isLogin;
   LoginStateEvent(this.isLogin);
 }
+
+/// 收藏歌曲列表变更通知
+class FavoriteSongChangedEvent {
+  final List<String> list;
+  FavoriteSongChangedEvent(this.list);
+}
