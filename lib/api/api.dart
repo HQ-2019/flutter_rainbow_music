@@ -4,7 +4,7 @@ import 'package:flutter_rainbow_music/model/rank_item_model.dart';
 import 'package:flutter_rainbow_music/model/special_item_model.dart';
 import 'package:html/parser.dart';
 import 'package:flutter_rainbow_music/model/recommend_model.dart';
-import 'package:flutter_rainbow_music/model/song_info_model.dart';
+import 'package:flutter_rainbow_music/model/song_detail_model.dart';
 import 'package:flutter_rainbow_music/base/network/http_response_model.dart';
 import 'package:flutter_rainbow_music/base/network/network_manager.dart';
 import 'package:dio/dio.dart';
@@ -29,7 +29,7 @@ extension Api on NetworkManager {
         params: {'cmd': 'playInfo', 'hash': hash});
     Map<String, dynamic> map = json.decode(response.data);
     HttpResponseModel r =
-        HttpResponseModel.success(SongInfoModel.fromJson(map));
+        HttpResponseModel.success(SongDetailModel.fromJson(map));
     return r;
   }
 
