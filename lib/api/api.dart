@@ -13,8 +13,14 @@ extension Api on NetworkManager {
   Future<HttpResponseModel> recommend() async {
     HttpResponseModel response =
         await NetworkManager().get('http://m.kugou.com/?json=true');
+
+    if (response.data == null) {
+      return HttpResponseModel.failure(
+          code: response.code, message: response.message);
+    }
+
     Map<String, dynamic> dataMap = json.decode(response.data);
-    Map<String, dynamic> m = Map();
+    Map<String, dynamic> m = {};
     m['banner'] = dataMap['banner'];
     m['data'] = dataMap['data'];
     m['special'] = dataMap['special']['list']['info'];
