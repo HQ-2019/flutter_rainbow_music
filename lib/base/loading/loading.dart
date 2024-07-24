@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
 
 class Loading {
   static TransitionBuilder init({
@@ -15,9 +16,15 @@ class Loading {
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
   }) {
+    Widget indicatorView = indicator ??
+        const SizedBox(
+          height: 30,
+          width: 80,
+          child: AudioBarsAnimation(itemCount: 5),
+        );
     EasyLoading.show(
         status: status,
-        indicator: indicator,
+        indicator: indicatorView,
         maskType: maskType,
         dismissOnTap: dismissOnTap);
   }
@@ -28,7 +35,7 @@ class Loading {
 
   static showToast(
     String status, {
-    Duration? duration,
+    Duration duration = const Duration(seconds: 2),
     EasyLoadingToastPosition? toastPosition,
     EasyLoadingMaskType? maskType,
     bool? dismissOnTap,
