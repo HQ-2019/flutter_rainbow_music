@@ -1,6 +1,7 @@
 import 'package:flutter_rainbow_music/dao/database_manager.dart';
 import 'package:flutter_rainbow_music/dao/song_db.dart';
 import 'package:flutter_rainbow_music/dao/song_detail_db.dart';
+import 'package:flutter_rainbow_music/model/song_detail_model.dart';
 import 'package:flutter_rainbow_music/model/song_item_model.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -20,7 +21,7 @@ class FavoriteSongDB {
     );
   }
 
-  static Future<List<SongItemModel>?> getFavoriteList(String phone) async {
+  static Future<List<SongItemModel>> getFavoriteList(String phone) async {
     final db = await DatabaseManager().db;
     List<Map<String, dynamic>> list = await db.rawQuery(
       '''
@@ -31,19 +32,28 @@ class FavoriteSongDB {
       [phone],
     );
 
+    List<SongItemModel> favoriteSongs = [];
     if (list.isNotEmpty) {
-      List<SongItemModel> favoriteSongs = [];
+      List<String> songHashes = [];
       for (var item in list) {
         final song = SongItemModel.fromJson(item);
         if (song.hash != null) {
-          song.songDetail = await SongDetailDB.getSongDetail(song.hash!);
+          favoriteSongs.add(song);
+          songHashes.add(song.hash!);
         }
-        favoriteSongs.add(song);
       }
-      return favoriteSongs;
+
+      // 批量获取歌曲详细信息
+      Map<String, SongDetailModel> songDetails =
+          await SongDetailDB.getSongDetails(songHashes);
+      for (var song in favoriteSongs) {
+        if (song.hash != null) {
+          song.songDetail = songDetails[song.hash!];
+        }
+      }
     }
 
-    return null;
+    return favoriteSongs;
   }
 
   static Future<List<String>?> getFavoriteSongHashList(String phone) async {
@@ -80,16 +90,13 @@ class FavoriteSongDB {
       SongItemModel? song}) async {
     final db = await DatabaseManager().db;
     try {
-      await db.insert(tableName, {'phone': phone, 'song_hash': songHash});
       if (song != null) {
         await SongDB.addSongInfo(song);
       }
+      await db.insert(tableName, {'phone': phone, 'song_hash': songHash});
     } catch (e) {
       if (e is DatabaseException && e.isUniqueConstraintError()) {
-        // 插入重复数据异常
-        if (song != null) {
-          await SongDB.addSongInfo(song);
-        }
+        // 插入重复数据异常，不需要处理
       } else {
         // 其他错误
         throw e;

@@ -38,6 +38,36 @@ class SongDetailDB {
     return null;
   }
 
+  static Future<Map<String, SongDetailModel>> getSongDetails(
+      List<String> songHashes) async {
+    final db = await DatabaseManager().db;
+
+    if (songHashes.isEmpty) {
+      return {};
+    }
+
+    // 构建查询语句和参数
+    final placeholders = songHashes.map((_) => '?').join(',');
+    final List<Map<String, dynamic>> results = await db.rawQuery(
+      '''
+      SELECT * FROM $tableName
+      WHERE hash IN ($placeholders)
+      ''',
+      songHashes,
+    );
+
+    // 将查询结果转换为 Map
+    Map<String, SongDetailModel> songDetails = {};
+    for (var result in results) {
+      final songDetail = SongDetailModel.fromJson(result);
+      if (songDetail.hash != null) {
+        songDetails[songDetail.hash!] = songDetail;
+      }
+    }
+
+    return songDetails;
+  }
+
   static Future<void> addSongDetail(SongDetailModel song) async {
     final db = await DatabaseManager().db;
     await db.insert(

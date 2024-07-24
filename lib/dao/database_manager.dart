@@ -1,4 +1,5 @@
 import 'package:flutter_rainbow_music/dao/favorite_song_db.dart';
+import 'package:flutter_rainbow_music/dao/played_song_db.dart';
 import 'package:flutter_rainbow_music/dao/song_db.dart';
 import 'package:flutter_rainbow_music/dao/song_detail_db.dart';
 import 'package:sqflite/sqflite.dart';
@@ -33,6 +34,7 @@ class DatabaseManager {
         SongDetailDB.onCreate(db, version: version);
         SongDB.onCreate(db, version: version);
         FavoriteSongDB.onCreate(db, version: version);
+        PlayedSongDB.onCreate(db, version: version);
       },
       onUpgrade: (Database db, int oldVersion, int newVersion) {
         // 数据库版本升级，增删表，修改表结构等...
