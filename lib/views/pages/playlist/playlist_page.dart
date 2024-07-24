@@ -4,8 +4,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
 import 'package:flutter_rainbow_music/base/utils/router_observer_util.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_rainbow_music/base/widgets/audio_bars_animation.dart';
 import 'package:flutter_rainbow_music/base/widgets/song_cover_image_view.dart';
 import 'package:flutter_rainbow_music/manager/player/player_manager.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
@@ -54,6 +52,7 @@ class _PlaylistPageState extends State<PlaylistPage> with RouteAware {
 
   @override
   void dispose() {
+    _logic.dispose();
     Get.delete<PlaylistPageLogic>();
     routeObserver.unsubscribe(this);
     super.dispose();

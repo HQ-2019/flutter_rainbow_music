@@ -40,6 +40,7 @@ class _RecommendPageState extends State<RecommendPage>
 
   @override
   void dispose() {
+    logic.dispose();
     Get.delete<RecommendPageLogic>();
     super.dispose();
   }

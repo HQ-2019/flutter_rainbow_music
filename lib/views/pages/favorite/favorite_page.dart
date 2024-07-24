@@ -22,6 +22,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   @override
   void dispose() {
+    _logic.dispose();
     Get.delete<FavoritePageLogic>();
     super.dispose();
   }
@@ -121,7 +122,7 @@ class _FavoritePageState extends State<FavoritePage> {
         PlayerManager().playList(
             song: song,
             list: _logic.songs.cast<MusicProvider>(),
-            source: '歌单：收藏');
+            source: '我的收藏');
       },
       favoriteTap: () {
         if (UserManager.isLogin()) {

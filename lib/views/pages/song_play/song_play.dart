@@ -67,6 +67,7 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
 
   @override
   void dispose() {
+    _logic.dispose();
     Get.delete<SongPlayPageLogic>();
     routeObserver.unsubscribe(this);
     _playProgessSubscription?.cancel();
@@ -227,7 +228,7 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
                 ),
                 Row(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     SizedBox(
                       width: 40,
                       child: IconButton(

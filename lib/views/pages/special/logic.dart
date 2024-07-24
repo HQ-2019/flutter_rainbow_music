@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_rainbow_music/base/loading/loading.dart';
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
 import 'package:flutter_rainbow_music/manager/player/eventbus/player_event.dart';
-import 'package:flutter_rainbow_music/manager/user/user_manager.dart';
-import 'package:flutter_rainbow_music/model/song_item_model.dart';
 import 'package:flutter_rainbow_music/model/special_item_model.dart';
 import 'package:flutter_rainbow_music/api/api.dart';
 import 'package:flutter_rainbow_music/base/network/http_response_model.dart';
@@ -13,6 +13,16 @@ import 'package:get/get.dart';
 class SpecialPageLogic extends GetxController {
   int? specailId;
   SpecialItemModel? model;
+
+  StreamSubscription? _favoriteSongChangeSubscription;
+  StreamSubscription? _playChangeSubscription;
+
+  @override
+  void dispose() {
+    _favoriteSongChangeSubscription?.cancel();
+    _playChangeSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void onReady() {
@@ -26,12 +36,13 @@ class SpecialPageLogic extends GetxController {
     fetchSpecailItemInfo(specailId);
 
     // 监听播放音乐
-    eventBus.on<MusicPlayEvent>().listen((event) {
+    _playChangeSubscription = eventBus.on<MusicPlayEvent>().listen((event) {
       updatePlayingItem(event.musicProvider.fetchHash());
     });
 
     // 收藏歌曲变更监听
-    eventBus.on<FavoriteSongChangedEvent>().listen((event) {
+    _favoriteSongChangeSubscription =
+        eventBus.on<FavoriteSongChangedEvent>().listen((event) {
       update();
     });
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
@@ -13,6 +14,16 @@ class PlaylistPageLogic extends GetxController {
   String? songsSource;
   List<String> playedList = [];
   List<String> selectedList = [];
+
+  StreamSubscription? _favoriteSongChangeSubscription;
+  StreamSubscription? _playChangeSubscription;
+
+  @override
+  void dispose() {
+    _favoriteSongChangeSubscription?.cancel();
+    _playChangeSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void onReady() {
@@ -30,12 +41,13 @@ class PlaylistPageLogic extends GetxController {
     }
 
     // 监听播放音乐
-    eventBus.on<MusicPlayEvent>().listen((event) {
+    _playChangeSubscription = eventBus.on<MusicPlayEvent>().listen((event) {
       updatePlayingItem(event.musicProvider.fetchHash());
     });
 
     // 收藏歌曲变更监听
-    eventBus.on<FavoriteSongChangedEvent>().listen((event) {
+    _favoriteSongChangeSubscription =
+        eventBus.on<FavoriteSongChangedEvent>().listen((event) {
       update();
     });
   }

@@ -56,6 +56,7 @@ class _SpecialPageState extends State<SpecialPage>
 
   @override
   void dispose() {
+    _logic.dispose();
     Get.delete<SpecialPageLogic>();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();

@@ -48,6 +48,7 @@ class _SongChartPageState extends State<SongChartPage>
 
   @override
   void dispose() {
+    _logic.dispose();
     Get.delete<SongChartPageLogic>();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();

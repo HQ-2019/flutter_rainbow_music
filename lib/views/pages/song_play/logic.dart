@@ -13,7 +13,16 @@ import 'package:get/get.dart';
 class SongPlayPageLogic extends GetxController {
   MusicProvider? song;
   String? songsSource;
-  StreamSubscription? playSubscription;
+
+  StreamSubscription? _favoriteSongChangeSubscription;
+  StreamSubscription? _playChangeSubscription;
+
+  @override
+  void dispose() {
+    _favoriteSongChangeSubscription?.cancel();
+    _playChangeSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void onReady() {
@@ -23,13 +32,14 @@ class SongPlayPageLogic extends GetxController {
     update();
 
     // 监听播放音乐
-    eventBus.on<MusicPlayEvent>().listen((event) {
+    _playChangeSubscription = eventBus.on<MusicPlayEvent>().listen((event) {
       song = event.musicProvider;
       update();
     });
 
     // 收藏歌曲变更监听
-    eventBus.on<FavoriteSongChangedEvent>().listen((event) {
+    _favoriteSongChangeSubscription =
+        eventBus.on<FavoriteSongChangedEvent>().listen((event) {
       update();
     });
   }
@@ -41,7 +51,7 @@ class SongPlayPageLogic extends GetxController {
   }
 
   void playLast() {
-    PlayerManager().playlast();
+    PlayerManager().playLast();
   }
 
   void playNext() {
