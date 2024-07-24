@@ -6,8 +6,11 @@ import 'package:flutter_rainbow_music/api/api.dart';
 import 'package:flutter_rainbow_music/base/network/http_response_model.dart';
 import 'package:flutter_rainbow_music/base/network/network_manager.dart';
 import 'package:flutter_rainbow_music/base/utils/eventbus_util.dart';
+import 'package:flutter_rainbow_music/dao/played_song_db.dart';
 import 'package:flutter_rainbow_music/manager/player/eventbus/player_event.dart';
 import 'package:flutter_rainbow_music/manager/player/provider/music_provider.dart';
+import 'package:flutter_rainbow_music/model/song_item_model.dart';
+import 'package:flutter_rainbow_music/views/pages/played_songs/played_songs_page.dart';
 
 /// 音乐播放循环方式
 enum PlaybackMode {
@@ -152,12 +155,23 @@ class PlayerManager {
     }
   }
 
-  void addPlaySong(MusicProvider song) {
+  void addPlaySong({required MusicProvider song, bool toNext = false}) {
     bool songExists =
         _playlist.any((item) => item.fetchHash() == song.fetchHash());
-    if (!songExists) {
-      _playlist.add(song);
+    if (songExists) {
+      return;
     }
+
+    if (toNext && _currentSong?.fetchHash() != null) {
+      int index = _playlist.indexWhere(
+          (element) => element.fetchHash() == _currentSong!.fetchHash());
+      if (index >= 0) {
+        _playlist.insert(index + 1, song);
+        return;
+      }
+    }
+
+    _playlist.add(song);
   }
 
   void cleanPlayList() {
@@ -188,7 +202,7 @@ class PlayerManager {
   }
 
   /// 播放上一首
-  void playlast() {
+  void playLast() {
     if (_lastSong != null) {
       play(_lastSong!);
       return;
@@ -263,8 +277,8 @@ class PlayerManager {
       _currentSong = song;
     }
 
-    // 如何播放的歌曲还为添加到列表中，则进行添加
-    addPlaySong(_currentSong!);
+    // 如果播放的歌曲还为添加到列表中，则进行添加
+    addPlaySong(song: _currentSong!);
 
     // 判断是否需要请求歌曲的播放信息
     String? url = _currentSong!.fetchSongUrl();
@@ -282,6 +296,9 @@ class PlayerManager {
 
     if (!isSameUrlSource) {
       _player.play(newSource);
+      // 保存播放记录
+      PlayedSongDB.addPlayedSong(
+          songHash: song.fetchHash()!, song: song as SongItemModel);
       return;
     }
 
