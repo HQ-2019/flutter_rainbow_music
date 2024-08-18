@@ -83,6 +83,7 @@ class DownloadSongDB {
     }
     final db = await DatabaseManager().db;
     try {
+      await SongDB.addSongInfo(song);
       await db.insert(
         tableName,
         {'song_hash': songHash, 'state': 0},
