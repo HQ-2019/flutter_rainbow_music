@@ -58,7 +58,7 @@ dev_dependencies:
   # 本地缓存
   shared_preferences: ^2.2.3
   # 轮播
-  carousel_slider: ^4.2.1
+  carousel_slider: ^5.0.0
   # 解耦通信（类似iOS的Notification）
   event_bus: ^2.0.0
   # loading组件
