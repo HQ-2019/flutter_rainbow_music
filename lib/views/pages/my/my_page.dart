@@ -307,7 +307,7 @@ class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
                                   'https://imgessl.kugou.com/stdmusic/20240709/20240709181216225472.jpg'),
                         ),
                         SizedBox(height: 5),
-                        Text('三年级科是那几款电脑上尽可能 那就肯定是',
+                        Text('至少还有你',
                             maxLines: 2, overflow: TextOverflow.ellipsis),
                       ],
                     ),

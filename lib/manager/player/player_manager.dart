@@ -24,10 +24,13 @@ class PlayerManager {
   PlayerManager._internal() {
     _init();
   }
+
   static final PlayerManager _instance = PlayerManager._internal();
+
   factory PlayerManager() => _instance;
 
   final AudioPlayer _player = AudioPlayer();
+
   AudioPlayer get player => _player;
   StreamSubscription? _playerStateChangeSubscription;
   StreamSubscription? _playerCompleteSubscription;
@@ -36,23 +39,28 @@ class PlayerManager {
 
   // 播放循环方式
   PlaybackMode _playbackModel = PlaybackMode.sequential;
+
   PlaybackMode get playbackModel => _playbackModel;
 
   // 播放列表
   List<MusicProvider> _playlist = [];
+
   List<MusicProvider> get playlist => _playlist;
 
   // 当前列表来源
   String? _playlistSource;
+
   String? get playlistSource => _playlistSource;
 
   // 当前选择的音乐
   MusicProvider? _currentSong;
+
   MusicProvider? get currentSong => _currentSong;
 
   MusicProvider? _lastSong;
 
   int? _timeLenght;
+
   int? get timeLenght => _timeLenght;
 
   void _init() {
@@ -327,5 +335,10 @@ class PlayerManager {
     }
     // 获取不到音乐链接时自动播放下一首
     playNext();
+  }
+
+  /// 从指定位置播放
+  seek(Duration position) {
+    _player.seek(position);
   }
 }

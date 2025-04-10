@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -29,7 +30,8 @@ class SongPlayPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SongPlayPageState();
 }
 
-class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
+class _SongPlayPageState extends State<SongPlayPage>
+    with RouteAware, TickerProviderStateMixin {
   final _logic = Get.put(SongPlayPageLogic());
   final ValueNotifier<double> _progress = ValueNotifier<double>(0.0);
   final ValueNotifier<int> _playTime = ValueNotifier<int>(0);
@@ -37,10 +39,17 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
 
   StreamSubscription? _playStateSubscription;
   StreamSubscription? _playProgessSubscription;
+  var _isMoving = false;
+
+  late final AnimationController rotationController;
 
   @override
   void initState() {
     super.initState();
+
+    rotationController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 20))
+          ..repeat();
 
     if (_logic.song != null) {
       _playState = _logic.song!.fetchPlayState();
@@ -48,6 +57,7 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
 
     _playProgessSubscription =
         eventBus.on<MusicPlayProgressEvent>().listen((event) {
+      if (_isMoving) return;
       _progress.value = event.progress;
       _playTime.value = event.time;
     });
@@ -177,12 +187,22 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
                     child: Container(
                       height: double.infinity,
                       color: themeColor,
-                      child: CachedNetworkImage(
-                        imageUrl: song?.fetchCoverUrl() ?? '',
-                        fit: BoxFit.cover,
-                        useOldImageOnUrlChange: true,
-                        errorWidget: (context, error, stackTrace) => Container(
-                          color: themeColor,
+                      child: AnimatedBuilder(
+                        animation: rotationController,
+                        builder: (BuildContext context, Widget? child) {
+                          return Transform.rotate(
+                            angle: rotationController.value * 2 * pi,
+                            child: child,
+                          );
+                        },
+                        child: CachedNetworkImage(
+                          imageUrl: song?.fetchCoverUrl() ?? '',
+                          fit: BoxFit.cover,
+                          useOldImageOnUrlChange: true,
+                          errorWidget: (context, error, stackTrace) =>
+                              Container(
+                            color: themeColor,
+                          ),
                         ),
                       ),
                     ),
@@ -296,13 +316,45 @@ class _SongPlayPageState extends State<SongPlayPage> with RouteAware {
                   child: ValueListenableBuilder<double>(
                     valueListenable: _progress,
                     builder: (context, value, child) {
-                      return LinearProgressIndicator(
-                        minHeight: 4,
-                        backgroundColor: Colors.white.withOpacity(0.2),
-                        value: value,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.white),
-                        borderRadius: BorderRadius.circular(2),
+                      return SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 4,
+                          inactiveTrackColor: Colors.white.withOpacity(0.2),
+                          activeTrackColor: Colors.white,
+                          thumbColor:
+                              _isMoving ? Colors.white : Colors.transparent,
+                          overlayColor: Colors.white.withOpacity(0.1),
+                          thumbShape: _isMoving
+                              ? const RoundSliderThumbShape(
+                                  enabledThumbRadius: 6)
+                              : const RoundSliderThumbShape(
+                                  enabledThumbRadius: 0),
+                          overlayShape:
+                              const RoundSliderOverlayShape(overlayRadius: 12),
+                        ),
+                        child: Slider(
+                          value: value.clamp(0.0, 1.0),
+                          onChangeStart: (newValue) {
+                            _isMoving = true; // 开始滑动时显示 thumb
+                          },
+                          onChanged: (newValue) {
+                            _progress.value = newValue;
+                            final totalSeconds =
+                                PlayerManager().timeLenght ?? 0;
+                            if (totalSeconds <= 0) return;
+                            _playTime.value = (totalSeconds * newValue).toInt();
+                          },
+                          onChangeEnd: (newValue) {
+                            _isMoving = false; // 滑动结束时隐藏 thumb
+                            final totalSeconds =
+                                PlayerManager().timeLenght ?? 0;
+                            if (totalSeconds <= 0) return;
+                            final newPosition = Duration(
+                              seconds: (totalSeconds * newValue).toInt(),
+                            );
+                            PlayerManager().seek(newPosition);
+                          },
+                        ),
                       );
                     },
                   ),

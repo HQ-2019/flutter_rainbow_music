@@ -7,7 +7,7 @@
 
 #### 开发环境
 
-- Flutter 2.22.3
+- Flutter 3.24.0
 - JAVA 17
 - Gradle 8.9
 
