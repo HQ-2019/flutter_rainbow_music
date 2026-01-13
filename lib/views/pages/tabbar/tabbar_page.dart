@@ -31,7 +31,7 @@ class _TabBarPageState extends State<TabBarPage> with RouteAware {
   // ];
   final List<Tab> _barItemList = [
     const Tab(
-      text: "首页-2",
+      text: "首页",
       icon: Icon(Icons.music_note_outlined),
       iconMargin: EdgeInsets.zero,
     ),
